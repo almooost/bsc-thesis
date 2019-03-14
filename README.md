@@ -11,4 +11,4 @@ Struktur:
     - flink = Bereinigte Daten, Bilder und Scripts für Aufbereitung
     - spark = Bereinigte Daten, Bilder und Scripts für Aufbereitung
 
-Daten erstellt von Samuel Alfano, Rapperswil, 14.03.2019
+Daten erstellt von Samuel Alfano, Rapperswil, 14.03.2019.
