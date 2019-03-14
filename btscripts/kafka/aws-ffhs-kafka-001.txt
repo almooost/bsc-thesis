@@ -1,0 +1,100 @@
+####
+Test installation of apache kafka on AWS EC2
+
+This is only an test description and does no represent the productive configuration
+####
+
+## System properties
+CPU: 1vCPU
+RAM: 4GB
+SSD: 30GB
+
+Link to description: http://kafka.apache.org/quickstart
+
+## Befor kafka installation
+0.) Update virtual machine
+```commandline
+# for ubuntu
+$ sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get -y autoremove && sudo reboot now
+# for centos
+$ sudo yum update
+```
+
+1.) Install Java and set Java HOME
+```commandline
+$ sudo apt-get -y install openjdk-8-jdk-headless
+$ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+
+# For centos:
+$ sudo yum install java-1.8.0-openjdk-headless.x86_64
+$ sudo export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.181-3.b13.amzn2.x86_64/
+```
+
+
+### Installation:
+1. Create new kafka directory and download kafka
+```commandline
+$ mkdir /opt/kafka
+$ cd /opt/kafka
+$ wget mirror.switch.ch/mirror/apache/dist/kafka/2.0.0/kafka_2.11-2.0.0.tgz
+$ tar xvfs kafka*.tgz
+```
+1.1 Change max Request size for kafka Server Settings
+$ sudo sed -i 's/104857600/2066182517/g' /opt/kafka/kafka_2.11-2.1.0/config/server.properties
+
+
+2. Execute Zookeeper, than Kafka
+```commandline
+$ cd kafka*
+$ bin/zookeeper-server-start.sh config/zookeeper.properties
+$ bin/kafka-server-start.sh config/server.properties
+```
+
+
+### Test kafka
+1. Create a topic named "test" as a single partition and only one replica:
+```commandline
+$ cd /opt/kafka/kafka*
+$ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+# Check with command
+$ bin/kafka-topics.sh --list --zookeeper localhost:2181
+```
+
+2. Open up a consumer
+# Open a new terminal
+```commandline
+$ cd /opt/kafka/kafka*/
+$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+```
+
+3. Start a producer and send some test message
+```commandline
+$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+This is a message
+This is another message
+```
+
+Now you should see these messages on the consumer terminal
+
+
+### Create Test Script to send data to kafka
+Link to python kafka library: https://pypi.org/project/kafka-python/
+
+1.) Install python and packages
+```commandline
+$ sudo yum install python3.x86_64
+$ sudo mkdir -p /opt/python/testdata
+$ cd /opt/python/
+$ sudo chown ec2-user:ec2-user -R testdata
+$ cd testdata
+$ python3.7 -m venv venv
+> source venv/bin/activate
+> pip3.7 install faker
+> pip3.7 install kafka-python
+
+2.) Create testscript and execute
+> python3.7 testscript.py
+
+3.) Leave venv
+> deactivate
+

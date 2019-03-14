@@ -1,0 +1,88 @@
+####
+Test installation of apache spark on AWS EC2
+
+This is only an test description and does no represent the productive configuration
+####
+
+Open Ports:
+TCP 8080 (For Web communication)
+TCP 7077 (For Spark internal communication)
+
+Prequesits:
+Update Virtual maschine:
+$ sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get -y autoremove && sudo reboot now
+
+# After reboot proceed with Step 1
+
+
+1.) Install Java and set Java HOME
+$ sudo apt-get -y install openjdk-8-jdk-headless
+$ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+$ sudo ln -s /usr/bin/python3 /usr/bin/python
+
+2.) Create directory for spark server and download spark binary (with hadoop)
+$ cd /opt/
+$ sudo mkdir spark
+$ cd spark
+$ sudo wget http://mirror.switch.ch/mirror/apache/dist/spark/spark-2.3.2/spark-2.3.2-bin-hadoop2.7.tgz
+$ sudo tar xvzf spark*.tgz
+
+3.) Startup Master
+
+$ cd /opt/spark
+$ ./spark*/sbin/start-master.sh
+
+# Check Spark Master on IP Port 8080
+Browser> http://52.59.240.13:8080/
+
+# Now you should see that this is a spark master
+
+4.) Startup Slave
+
+$ cd /opt/spark
+$ ./spark*/sbin/start-slave.sh spark://52.59.240.13:7077
+
+# Now you should see on the master Web-Interface a worke and its state
+
+--- Working with Spark ---
+
+---- Running a job with pyspark ----
+
+To run a job with pyspark, change to spark directory and open pyspark
+$ cd /opt/spark
+$ ./spark*/bin/pyspark --master spark://52.59.240.13:7077
+
+..
+
+---- Streaming example ----
+
+Create python Script
+...
+
+Upload to server:
+$ scp -i /home/samuel/Documents/ffhs/Lightsail.pem file.py ubuntu@52.59.240.13:/tmp/
+
+Streaming Server (Terminal 1)
+$ nc -lk 9999
+
+Execute Python file (Terminal 2)
+$ cd /opt/spark
+
+# Start spark job (sudo if it needs to write files, like checkpoints)
+$ sudo ./spark-2.3.1-bin-hadoop2.7/bin/spark-submit /opt/files/wordcount.py localhost 9999
+
+### Create Spark cluster
+
+# add "slaves" file to spark configuration
+$ cp /opt/spark/spark*/conf/slaves.template /opt/spark/spark*/conf/slaves
+$ vi /opt/spark/spark*/conf/slaves
+# Add all slaves (spark worker) ips to this file
+
+# Generate ssh key and add it to the .ssh/authorized_keys file of the workers
+$ ssh-keygen
+> 3x yes
+# Copy and export to authorized_keys file of slaves
+
+# Start slaves on master
+$ /opt/spark/spark*/sbin/start-slaves.sh
+> should start all slaves, otherwise would print error

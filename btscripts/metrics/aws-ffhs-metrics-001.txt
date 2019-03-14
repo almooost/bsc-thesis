@@ -1,0 +1,23 @@
+####
+Additional information for graphite metrics
+####
+
+# Get Metrics out of a big data machine
+
+# To download a csv or json file
+1. Create a short URL from existing Graph and open it in a new tab
+For example: 
+http://ec2-54-86-2-195.compute-1.amazonaws.com/render/?width=2253&height=1131&from=-1hours&target=carbon.agents.1a4fca2ed9bb-a.memUsage&target=carbon.relays.1a4fca2ed9bb-a.memUsage
+
+2. Then add the format parameter in the desired format:
+http://ec2-54-86-2-195.compute-1.amazonaws.com/render/?width=2253&height=1131&from=-1hours&target=carbon.agents.1a4fca2ed9bb-a.memUsage&target=carbon.relays.1a4fca2ed9bb-a.memUsage&format=csv
+
+Info from: https://stackoverflow.com/questions/21331778/statsd-graphite-get-data-as-csv
+
+Text: 
+As you might be aware, Graphite has a URL API.
+
+graphite.example.com/render/?target=Graphite.system.data.ip-10-0-0-1.load
+Returns the line-graph. To get data in csv or even json, append- &format=json
+
+graphite.example.com/render/?target=Graphite.system.data.ip-10-0-0-1.load&format=csv
